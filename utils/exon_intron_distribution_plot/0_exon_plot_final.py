@@ -153,112 +153,51 @@ for seed in tqdm(seeds, desc="Seeds"):
 # ---------------------------------------------------------------------
 # merged plotting: box + strip, narrow boxes, custom legend, rotated ticks
 # ---------------------------------------------------------------------
-# ---------------------------------------------------------------------
-# merged plotting: strip (先) + box (後)
-# ---------------------------------------------------------------------
 df = pd.DataFrame(all_exon_scores)
-df['species'] = df['species'].map(species_map)   # title‐case names
+# map to title‐case species names
+df['species'] = df['species'].map(species_map)
 
 plt.figure(figsize=(12.5, 6))
-
-# 1️⃣ 先畫散點 (stripplot) ── 放在較低 zorder
-ax = sns.stripplot(
+ax = sns.boxplot(
     x='species', y='score', hue='Pred', data=df,
-    hue_order=['TP', 'FP'],
-    dodge=True, jitter=0.2, size=1.5, linewidth=0,
-    palette={'TP': '#1f77b4', 'FP': '#ff7f0e'},
-    zorder=1          # ★ 散點圖層較低
-)
-
-# 2️⃣ 再畫盒形圖 (boxplot) ── 蓋在散點上
-sns.boxplot(
-    x='species', y='score', hue='Pred', data=df,
-    hue_order=['TP', 'FP'],
+    hue_order=['TP','FP'],
     dodge=True, width=0.8,
-    palette={'TP': '#1f77b4', 'FP': '#ff7f0e'},
+    palette={'TP':'#1f77b4','FP':'#ff7f0e'},
     showcaps=True, showfliers=False,
-    boxprops={'facecolor': 'none', 'edgecolor': 'black', 'linewidth': 2},
-    whiskerprops={'color': 'black', 'linewidth': 2},
-    capprops={'color': 'black', 'linewidth': 2},
-    medianprops={'color': 'black', 'linewidth': 2},
-    ax=ax,
-    zorder=10         # ★ 盒形圖層較高
+    # boxprops={'facecolor':'white','edgecolor':'black'},
+    # whiskerprops={'color':'black'}, capprops={'color':'black'},
+    # medianprops={'color':'black'}
+    # 線寬全部調大
+    boxprops     = {'facecolor': 'white', 'edgecolor': 'black', 'linewidth': 2},
+    whiskerprops = {'color': 'black', 'linewidth': 2},
+    capprops     = {'color': 'black', 'linewidth': 2},
+    medianprops  = {'color': 'black', 'linewidth': 2}
+)
+sns.stripplot(
+    x='species', y='score', hue='Pred', data=df,
+    hue_order=['TP','FP'],
+    dodge=True, jitter=0.2, size=1.5, linewidth=0,
+    palette={'TP':'#1f77b4','FP':'#ff7f0e'},
+    ax=ax
 )
 
-# ── 軸與圖例設定 ──────────────────────────────────────────────
+# formatting
 ax.set_xlabel('')
 ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
-
-from matplotlib.lines import Line2D
 point_handles = [
-    Line2D([0], [0], marker='o', color='#1f77b4', linestyle='', markersize=10),
-    Line2D([0], [0], marker='o', color='#ff7f0e', linestyle='', markersize=10)
+    Line2D([0],[0], marker='o', color='#1f77b4', linestyle='', markersize=10),
+    Line2D([0],[0], marker='o', color='#ff7f0e', linestyle='', markersize=10)
 ]
 ax.legend(
-    point_handles, ['TP', 'FP'],
+    point_handles, ['TP','FP'],
     fontsize=25, loc='upper center',
-    bbox_to_anchor=(0.5, 1.15), ncol=2, frameon=False
+    bbox_to_anchor=(0.5,1.15), ncol=2, frameon=False
 )
-
 ax.set_ylabel('Exon Score', fontsize=25)
 ax.tick_params(labelsize=25)
 sns.despine()
 plt.tight_layout()
-plt.savefig("merged_exon_box.png", dpi=300)
+plt.savefig("merged_exon_box_strip.png", dpi=300)
 plt.close()
 
-print("Merged exon plot saved → merged_exon_box.png")
-
-
-
-# # ---------------------------------------------------------------------
-# # merged plotting: box + strip, narrow boxes, custom legend, rotated ticks
-# # ---------------------------------------------------------------------
-# df = pd.DataFrame(all_exon_scores)
-# # map to title‐case species names
-# df['species'] = df['species'].map(species_map)
-
-# plt.figure(figsize=(12.5, 6))
-# ax = sns.boxplot(
-#     x='species', y='score', hue='Pred', data=df,
-#     hue_order=['TP','FP'],
-#     dodge=True, width=0.8,
-#     palette={'TP':'#1f77b4','FP':'#ff7f0e'},
-#     showcaps=True, showfliers=False,
-#     # boxprops={'facecolor':'white','edgecolor':'black'},
-#     # whiskerprops={'color':'black'}, capprops={'color':'black'},
-#     # medianprops={'color':'black'}
-#     # 線寬全部調大
-#     boxprops     = {'facecolor': 'white', 'edgecolor': 'black', 'linewidth': 2},
-#     whiskerprops = {'color': 'black', 'linewidth': 2},
-#     capprops     = {'color': 'black', 'linewidth': 2},
-#     medianprops  = {'color': 'black', 'linewidth': 2}
-# )
-# sns.stripplot(
-#     x='species', y='score', hue='Pred', data=df,
-#     hue_order=['TP','FP'],
-#     dodge=True, jitter=0.2, size=1.5, linewidth=0,
-#     palette={'TP':'#1f77b4','FP':'#ff7f0e'},
-#     ax=ax
-# )
-
-# # formatting
-# ax.set_xlabel('')
-# ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
-# point_handles = [
-#     Line2D([0],[0], marker='o', color='#1f77b4', linestyle='', markersize=10),
-#     Line2D([0],[0], marker='o', color='#ff7f0e', linestyle='', markersize=10)
-# ]
-# ax.legend(
-#     point_handles, ['TP','FP'],
-#     fontsize=25, loc='upper center',
-#     bbox_to_anchor=(0.5,1.15), ncol=2, frameon=False
-# )
-# ax.set_ylabel('Exon Score', fontsize=25)
-# ax.tick_params(labelsize=25)
-# sns.despine()
-# plt.tight_layout()
-# plt.savefig("merged_exon_box_strip.png", dpi=300)
-# plt.close()
-
-# print("Merged exon plot saved → merged_exon_box_strip.png")
+print("Merged exon plot saved → merged_exon_box_strip.png")
